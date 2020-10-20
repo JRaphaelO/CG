@@ -1,148 +1,151 @@
 #include "mygl.h"
 
-void PutPixel(Point point, Color color) {
-    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 0] = color.red;
-    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 1] = color.green;
-    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 2] = color.blue;
-    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 3] = color.alpha;
-}
-
-
-void MidPointLine(int xi, int yi, int xf, int yf, Color color, int isInvert, int isSpecial) {
-    int dx = xf - xi;
-    int dy = yf - yi;
-
-    int D = 2 * dy - dx;
-    int inc_L = 2 * dy;
-    int inc_NE = 2 * (dy - dx);
-
-    Point point;
-
-    if (isSpecial)
-    {
-        point.x = xi;
-        point.y = yi;
-    }
-    else {
-        point.x = xi;
-        point.y = yi;
-    }
-
-    if (isInvert){
-        Point aux;
-        aux.x = point.y;
-        aux.y = point.x;
-        PutPixel(aux, color);
-    }
-    else 
-        PutPixel(point, color);
-
-    while ( point.x < xf)
-    {
-        if (D <= 0) 
-            D += inc_L;
-        else {
-            D += inc_NE;
-
-            if (isSpecial) point.y--;
-            else point.y++;
-        }
-
-        point.x ++;
-
-        if (isInvert){
-            Point aux;
-            aux.x = point.y;
-            aux.y = point.x;
-            PutPixel(aux, color);
-        }
-        else 
-            PutPixel(point, color);
-    }
-
-}
-
-void DrawLine(Point point1, Point point2, Color color) {
-    float dx = point2.x - point1.x;
-    float dy = point2.y - point1.y;
-
-    float m = dy/dx;
-
-    if ((m >= 0 && m <= 1 && point1.x < point2.x) || (dy == 0 && point1.x < point2.x)) // Octante 1 
-        MidPointLine(point1.x, point1.y, point2.x, point2.y, color, 0, 0);
-    
-    else if ((m > 1 && m < INFINITO && point1.y < point2.y) || (dx == 0 && point1.y < point2.y)) // Octante 2
-        MidPointLine(point1.y, point1.x, point2.y, point2.x, color, 1, 0);
-    
-    else if (m < -1 && m > -INFINITO && point1.y < point2.y) // Octante 3
-        MidPointLine(point1.y, point2.x, point2.y, point1.x, color, 1, 1);
-
-    else if (m <= 0 && m >= -1 && point2.x < point1.x) // Octante 4
-        MidPointLine(point2.x, point1.y, point1.x, point2.y, color, 0, 1);
-
-    else if ((m > 0 && m <= 1 && point2.x < point1.x) || (dy == 0 && point2.x < point1.x)) // Octante 5
-        MidPointLine(point2.x, point2.y, point1.x, point1.y, color, 0, 0);
-    
-    else if ((m > 1 && m < INFINITO && point2.y < point1.y) || (dx == 0 && point2.y < point1.y)) // Octante 6
-        MidPointLine(point2.y, point2.x, point1.y, point1.x, color, 1, 0);
-    
-    else if (m < -1 && m > -INFINITO && point2.y < point1.y) // Octante 7
-        MidPointLine(point2.y, point1.x, point1.y, point2.x, color, 1, 1);
-    
-    else if (m < 0 && m >= -1 && point1.x < point2.x) // Octante 8
-        MidPointLine(point1.x, point2.y, point2.x, point1.y, color, 0, 1);
-}
-
-
-void DrawTriangle(Point point1, Point point2, Point point3, Color color) {
-    DrawLine(point1, point2, color);
-    DrawLine(point2, point3, color);
-    DrawLine(point3, point1, color);
-}
-
-// Definição da função que chamará as funções implementadas pelo aluno
-void MyGlDraw(void) {
-
-    struct Point point;
-    point.x = 15;
-    point.y = 23;
-
-    struct Color colorPurple;
-    colorPurple.red = 255;
-    colorPurple.green = 0;
-    colorPurple.blue = 255;
-    colorPurple.alpha = 255;
-
+Color CreateColor(int red, int green, int blue, int alpha) {
     Color color;
-    // point.x = rand() % IMAGE_WIDTH;
-    // point.y = rand() % IMAGE_HEIGHT;
-    color.red = rand() % 256;
-    color.green = rand() % 256;
-    color.blue = rand() % 256;
-    color.alpha = rand() % 256;
-    
-    PutPixel(point, color);
+    color.red = red;
+    color.green = green;
+    color.blue = blue;
+    color.alpha = alpha;
 
-    struct Point point1;
-    struct Point point2;
-    struct Point point3;
-    
-    point1.x = 142;
-    point1.y = 80;
+    return color;
+}
 
-    point2.x = 500;
-    point2.y = 350;
+Point CreatePoint(int x, int y, Color color ) {
+    Point point;
+    point.x = x;
+    point.y = y;
+    point.color = color;
 
-    DrawLine(point1, point2, color);
+    return point;
+}
 
-    point1.x = 203;
-    point1.y = 48;
+int abs(int x) {
+    if (x < 0) return -1*x;
+    return x;
+}
 
-    point2.x = 27;
-    point2.y = 48;
+void PutPixel(Point point) {
+    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 0] = point.color.red;
+    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 1] = point.color.green;
+    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 2] = point.color.blue;
+    fb_ptr[4*point.x + 4*point.y*IMAGE_WIDTH + 3] = point.color.alpha;
+}
 
-    point3.x = 450;
-    point3.y = 490;
+void DrawLine(Point point1, Point point2) {
+    int dx, dy, D, increment_x = 1, increment_y = 1, i;
 
-    DrawTriangle(point1, point2, point3, color);
+    dx = point2.x - point1.x;
+    dy = point2.y - point1.y;
+
+    if(dx < 0) increment_x = -1*increment_x;
+    if(dy < 0) increment_y = -1*increment_y;
+
+    float dR = point2.color.red - point1.color.red;
+    float dG = point2.color.green - point1.color.green;
+    float dB = point2.color.blue - point1.color.blue;  
+    float dA = point2.color.alpha - point1.color.alpha;
+
+    dx = abs(dx);
+    dy = abs(dy);
+
+    Point point = point1;  
+
+    if (dx > dy){
+        D = (dy * 2) - dx;
+        dR /= dx;
+        dG /= dx;
+        dB /= dx;
+        dA /= dx;
+
+        for (i = 0; i < dx; i++)
+        {
+            point.color.red += dR;
+            point.color.green += dG;
+            point.color.blue += dB;
+            point.color.alpha += dA;
+
+            PutPixel(point);
+            if (D < 0)
+                D += dy * 2;
+            else {
+                point.y += increment_y;
+                D += (dy - dx) * 2;
+            }
+            point.x += increment_x;
+        }
+    } else {
+        D = (dx * 2) - dy;
+        dR /= dy;
+        dG /= dy;
+        dB /= dy;
+        dA /= dy;
+
+        for (i = 0; i < dy; i++)
+        {
+            point.color.red += dR;
+            point.color.green += dG;
+            point.color.blue += dB;
+            point.color.alpha += dA;
+
+            PutPixel(point);
+            if (D < 0)
+                D += dx * 2;
+            else {
+                point.x += increment_x;
+                D += (dx - dy) * 2;
+            }
+            point.y += increment_y;
+        }
+    }
+}
+
+void DrawTriangle(Point point1, Point point2, Point point3){
+    DrawLine(point1, point2);
+    DrawLine(point1, point3);
+    DrawLine(point2, point3);
+}
+
+void MyGlDraw(void) {
+    Color color1 = CreateColor(255, 0, 255, 255);
+    Color color2 = CreateColor(0, 255, 255, 255);
+    Color color3 = CreateColor(255, 255, 0, 255);
+    Color color4 = CreateColor(255, 255, 255, 255);
+    Color color5 = CreateColor(255, 200, 200, 255);
+    Color color6 = CreateColor(180, 250, 20, 255);
+    Color color7 = CreateColor(55, 150, 200, 255);
+    Color color8 = CreateColor(255, 200, 100, 255);
+    Color color9 = CreateColor(255, 200, 255, 255);
+
+    Point point1 = CreatePoint(IMAGE_WIDTH/2, IMAGE_HEIGHT/2, color1);
+    Point point2 = CreatePoint(0, 0, color2);
+    Point point3 = CreatePoint(IMAGE_WIDTH-1, 0, color3);
+    Point point4 = CreatePoint(0, IMAGE_HEIGHT-1, color4);
+    Point point5 = CreatePoint(IMAGE_WIDTH-1, IMAGE_HEIGHT-1, color5);
+    Point point6 = CreatePoint(IMAGE_WIDTH/2, 0, color6);
+    Point point7 = CreatePoint(IMAGE_WIDTH/2, IMAGE_HEIGHT-1, color7);
+    Point point8 = CreatePoint(0, IMAGE_HEIGHT/2, color8);
+    Point point9 = CreatePoint(IMAGE_WIDTH-1, IMAGE_HEIGHT/2, color9);
+
+    PutPixel(point1);
+    PutPixel(point2);
+    PutPixel(point3);
+    PutPixel(point4);
+    PutPixel(point5);
+    PutPixel(point6);
+    PutPixel(point7);
+    PutPixel(point8);
+    PutPixel(point9);
+
+    DrawLine(point1, point2);
+    DrawLine(point1, point3);
+    DrawLine(point1, point4);
+    DrawLine(point1, point5);
+    DrawLine(point1, point6);
+    DrawLine(point1, point7);
+    DrawLine(point1, point8);
+    DrawLine(point1, point9);
+
+    DrawTriangle(point1, point8, point3);
+    DrawTriangle(point6, point4, point2);
+    DrawTriangle(point7, point5, point9);
 }

@@ -18,20 +18,19 @@ typedef struct Point
 {
     int x;
     int y;
+    Color color;
 }Point, **P;
 
 // Rasteriza um ponto na mémoria de vídeo
-void PuPixel(Point point, Color color);
+void PuPixel(Point point);
 
-void DrawLine(Point point1, Point point2, Color color);
+// Rasteriza uma linha na mémoria de vídeo.
+void DrawLine(Point point1, Point point2);
 
-void DrawTriangle(Point point1, Point point2, Point point3, Color color);
+// Rasteriza um triângulo na memória de vídeo.
+void DrawTriangle(Point point1, Point point2, Point point3);
 
 // Declaração da função que chamará as funções implementadas pelo aluno
 void MyGlDraw(void);
-
-//
-// >>> Declare aqui as funções que você implementar <<<
-//
 
 #endif  // MYGL_H
