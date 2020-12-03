@@ -15,6 +15,8 @@
 #define IMAGE_WIDTH 512  // Largura da janela OpenGL em pixels.
 #define IMAGE_HEIGHT 512 // Altura da janela OpenGL em pixels.
 
+using namespace std;
+
 // Array contendo as coordenadas X,Y e Z de tres vertices (um trianglulo).
 float vertices[] = {-0.25f, -0.5f, -0.1f, 0.75f, 0.0f, 0.0f, // red triangle (closer)
                     0.25f, 0.5f, -0.1f, 0.75f, 0.0f, 0.0f,
@@ -28,6 +30,56 @@ char *vertex_shader_source = NULL;
 unsigned int shader_program;
 unsigned int vbo; // Vertex buffer object ID
 unsigned int vao; // Vertex array object ID
+
+float module(float a, float b, float c)
+{
+    return sqrt(pow(a, 2) + pow(b, 2) + pow(c, 2));
+}
+
+void vetorial(float *vector1, float *vector2, float *vectorReturn)
+{
+    vectorReturn[0] = vector1[1] * vector2[2] - vector1[2] * vector2[1];
+    vectorReturn[1] = vector1[2] * vector2[0] - vector1[0] * vector2[2];
+    vectorReturn[2] = vector1[0] * vector2[1] - vector1[1] * vector2[0];
+}
+
+void calculate_zc(float *vector, float *vectorReturn)
+{
+    vectorReturn[0] = -1 * vector[0] / module(vector[0], vector[1], vector[2]);
+    vectorReturn[1] = -1 * vector[1] / module(vector[0], vector[1], vector[2]);
+    vectorReturn[2] = -1 * vector[2] / module(vector[0], vector[1], vector[2]);
+}
+
+void calculate_xc(float *vector1, float *vector2, float *vectorReturn)
+{
+    float v[3];
+
+    vetorial(vector1, vector2, v);
+
+    vectorReturn[0] = v[0] / module(v[0], v[1], v[2]);
+    vectorReturn[1] = v[1] / module(v[0], v[1], v[2]);
+    vectorReturn[2] = v[2] / module(v[0], v[1], v[2]);
+}
+
+void create_matrix_bt(float *vector1, float *vector2, float *b_t)
+{
+  float zc[3], xc[3], yc[3];
+
+  calculate_zc(vector1, zc);
+  calculate_xc(vector2, zc, xc);
+  calculate_xc(zc, xc, yc);
+
+  float bt[16] = {xc[0], yc[0], zc[0], 0.0f,
+                  xc[1], yc[1], zc[1], 0.0f,
+                  xc[2], yc[2], zc[2], 0.0f,
+                  0.00f, 0.00f, 0.0f, 1.0f};
+
+  int l;
+  for (l= 0; l < 16; l++)
+    b_t[l] = bt[l];
+}
+
+// void calculateMatrix()
 
 //********************************************************************************************************************
 // A função LoadShader() é baseada em https://stackoverflow.com/a/174552/6107321
@@ -101,52 +153,35 @@ void Display(void)
 
     glm::mat4 view_mat = glm::make_mat4(view_array);
 
-    float view_array2[16] = {1.0f, 0.0f, 0.35f, 0.0f,
-                             -1.0f, 1.0f, -0.35f, 0.0f,
-                             0.0f, 0.04f, -0.87f, 0.0f,
-                             0.1f, -0.11f, 0.29f, 1.0f};
+    float b_array[16];
+    float p[3]{-0.1f, 0.1f, 0.1f};
+    float d[3]{0.1f, -0.1f, -1.1f};
+    float u[3]{0.0f, 1.0f, 0.0f};
+    
+    create_matrix_bt(d, u, b_array);
 
-    glm::mat4 view_mat2 = glm::make_mat4(view_array2);
+    glm::mat4 b_t = glm::make_mat4(b_array);
 
-    // float b_trasnposta[16] = {0.00f, -1.00f, 0.00f, 0.00f,
-    //                           0.00f, 1.00f, 0.04f, 0.00f,
-    //                           0.35f, -0.35f, -0.87f, 0.00f,
-    //                           0.00f, 0.00f, 0.00f, 1.00f};
+    float t_array[16] = {1.00f, 0.00f, 0.00f, 0.00f,
+                         0.00f, 1.00f, 0.00f, 0.00f,
+                         0.00f, 0.00f, 1.00f, 0.00f,
+                         -p[0], -p[1], -p[2], 1.00f};
 
-    // float b_trasnposta[16] = {0.00f, 0.00f, 0.35f, 0.00f,
-    //                           -1.00f, 1.00f, -0.35f, 0.00f,
-    //                           0.00f, 0.04f, -0.87f, 0.00f,
-    //                           0.00f, 0.00f, 0.00f, 1.00f};
+    glm::mat4 t = glm::make_mat4(t_array);
 
-    // glm::mat4 b_trasnposta_mat = glm::make_mat4(b_trasnposta);
-
-    // // float t[16] = {1.0f, 0.0f, 0.0f, 0.0f,
-    // //                0.25f, 1.0f, 0.0f, 0.0f,
-    // //                0.1f, 0.0f, 1.0f, 0.0f,
-    // //                -0.1f, 0.0f, 0.0f, 1.0f};
-
-    // float t[16] = {1.0f, 0.0f, 0.0f, -0.1f,
-    //                0.0f, 1.0f, 0.0f, 0.1f,
-    //                0.0f, 0.0f, 1.0f, 0.25f,
-    //                0.0f, 0.0f, 0.0f, 1.0f};
-
-    // glm::mat4 t_mat = glm::make_mat4(t);
-
-    // glm::mat4 view_mat2 = b_trasnposta_mat * t_mat;
-
-    // Matriz Projection //////////////////////////////////////////////////////
+        // Matriz Projection //////////////////////////////////////////////////////
     // You will have to change the contents of this matrix for the exercises
     float proj_array[16] = {1.0f, 0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f, 0.0f,
                             0.0f, 0.0f, 1.0f, 0.0f,
                             0.0f, 0.0f, 0.0f, 1.0f};
-
+    // afasd
     glm::mat4 proj_mat = glm::make_mat4(proj_array);
 
     float proj_array2[16] = {1.0f, 0.0f, 0.0f, 0.0f,
                              0.0f, 1.0f, 0.0f, 0.0f,
-                             0.0f, 0.0f, 1.0f, -2.0f,
-                             0.0f, 0.0f, 0.5f, 1.0f};
+                             0.0f, 0.0f, 1.0f, -8.0f,
+                             0.0f, 0.0f, 0.125f, 0.0f};
 
     glm::mat4 proj_mat2 = glm::make_mat4(proj_array2);
 
@@ -167,15 +202,15 @@ void Display(void)
 
     glm::mat4 model_view_proj_mat3 = flip_z_mat * proj_mat2 * view_mat * model_mat; // Questao 3.
 
-    glm::mat4 model_view_proj_mat4 = flip_z_mat * proj_mat2 * view_mat2 * model_mat; // Questao 3.
+    glm::mat4 model_view_proj_mat4 = flip_z_mat * proj_mat2 * (b_t * t) * model_mat; // Questao 3.
 
     unsigned int transformLoc;
     GL_CHECK(transformLoc = glGetUniformLocation(shader_program, "transform"));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat1));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat2));
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat3));
-    // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat4));
+    // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat3));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat4));
 
     // Ativa o Vertex Array Object selecionado.
     glBindVertexArray(vao);

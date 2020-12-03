@@ -1,0 +1,25 @@
+{
+  "rules": [
+    {
+      "dificulty": "easy",
+      "target": 300,
+      "trophy": "Superação de distância 1",
+      "borg-scale-max": 4,
+      "borg-scale-min": 3
+    },
+    {
+      "dificulty": "mediun",
+      "target": 500,
+      "trophy": "Superação de distância 2",
+      "borg-scale-max": 8,
+      "borg-scale-min": 3
+    },
+    {
+      "dificulty": "hard",
+      "target": 700,
+      "trophy": "Superação de distância 3",
+      "borg-scale-max": 8,
+      "borg-scale-min": 3
+    }
+  ]
+}
