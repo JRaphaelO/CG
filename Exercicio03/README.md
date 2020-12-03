@@ -31,8 +31,42 @@ make -f Makefile
 
 ### Escala
 
+<<<<<<< HEAD
 Modificar a escala dos triângulos demonstrados na figura 2, para $(x, y, z) = (1/3, 3/2, 1)$, sendo assim temos que a matriz utilizada é:
 
 
 
 ## Resultado
+=======
+Modificar a escala dos triângulos demonstrados na figura 2, para $$ (x, y, z) = (1/3, 3/2, 1) $$, sendo assim temos que a matriz utilizada é:
+
+```c++
+// ( 1/3 3/2 1 ) = ( 0.33f 1.50f 1.00f ) 
+float model_array1[16] = {0.33f, 0.0f, 0.0f, 0.0f,
+                          0.0f, 1.50f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 1.0f, 0.0f,
+                          0.0f, 0.0f, 0.0f, 1.0f};
+```
+
+Com isso temos que o resultado obtido pela modificação da escala, pode ser vista na figura 3.
+
+![Exercicio escala.](https://i.imgur.com/8knRiHr.png)
+
+### Translação
+
+Modificar a translação dos triângulos demonstrados na figura 2, para (x, y, z) = (1, 0, 0), sendo assim temos que a matriz utilizada é:
+
+```c++
+// 1 0 0
+float model_array2[16] = {1.0f, 0.0f, 0.0f, 0.0f,
+                          0.0f, 1.0f, 0.0f, 0.0f,
+                          0.0f, 0.0f, 1.0f, 0.0f,
+                          1.0f, 0.0f, 0.0f, 1.0f};
+```
+
+Com isso temos que o resultado obtido pela modificação da escala, pode ser vista na figura 4.
+
+![Exercicio Translação.](https://i.imgur.com/Xu2vOBw.png)
+
+## Resultado
+>>>>>>> ff848a5c0b87189ce2128e78a00d92ba23183515
