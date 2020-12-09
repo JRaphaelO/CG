@@ -63,20 +63,20 @@ void calculate_xc(float *vector1, float *vector2, float *vectorReturn)
 
 void create_matrix_bt(float *vector1, float *vector2, float *b_t)
 {
-  float zc[3], xc[3], yc[3];
+    float zc[3], xc[3], yc[3];
 
-  calculate_zc(vector1, zc);
-  calculate_xc(vector2, zc, xc);
-  calculate_xc(zc, xc, yc);
+    calculate_zc(vector1, zc);
+    calculate_xc(vector2, zc, xc);
+    calculate_xc(zc, xc, yc);
 
-  float bt[16] = {xc[0], yc[0], zc[0], 0.0f,
-                  xc[1], yc[1], zc[1], 0.0f,
-                  xc[2], yc[2], zc[2], 0.0f,
-                  0.00f, 0.00f, 0.0f, 1.0f};
+    float bt[16] = {xc[0], yc[0], zc[0], 0.0f,
+                    xc[1], yc[1], zc[1], 0.0f,
+                    xc[2], yc[2], zc[2], 0.0f,
+                    0.00f, 0.00f, 0.0f, 1.0f};
 
-  int l;
-  for (l= 0; l < 16; l++)
-    b_t[l] = bt[l];
+    int l;
+    for (l = 0; l < 16; l++)
+        b_t[l] = bt[l];
 }
 
 // void calculateMatrix()
@@ -144,6 +144,18 @@ void Display(void)
                               1.0f, 0.0f, 0.0f, 1.0f};
     glm::mat4 model_mat2 = glm::make_mat4(model_array2);
 
+    float model_array3[16] = {-1.0f, 0.0f, 0.0f, 0.0f,
+                              0.0f, 1.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 1.0f, 0.0f,
+                              1.0f, 0.0f, 0.0f, 1.0f};
+    glm::mat4 model_mat3 = glm::make_mat4(model_array3);
+
+    float model_array4[16] = {1.0f, 0.0f, 0.0f, 0.0f,
+                              0.0f, -1.0f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 1.0f, 0.0f,
+                              1.0f, 0.0f, 0.0f, 1.0f};
+    glm::mat4 model_mat4 = glm::make_mat4(model_array4);
+
     // Matriz View ////////////////////////////////////////////////////////////
     // You will have to change the contents of this matrix for the exercises
     float view_array[16] = {1.0f, 0.0f, 0.0f, 0.0f,
@@ -157,10 +169,28 @@ void Display(void)
     float p[3]{-0.1f, 0.1f, 0.1f};
     float d[3]{0.1f, -0.1f, -1.1f};
     float u[3]{0.0f, 1.0f, 0.0f};
-    
+
     create_matrix_bt(d, u, b_array);
 
     glm::mat4 b_t = glm::make_mat4(b_array);
+
+    float b_array2[16];
+    float p2[3]{1.0f, 0.9f, 2.5f};
+    float d2[3]{0.0f, 0.1f, -2.5f};
+    float u2[3]{0.0f, 1.0f, 0.0f};
+
+    create_matrix_bt(d2, u2, b_array2);
+
+    glm::mat4 b_t2 = glm::make_mat4(b_array2);
+
+    float b_array3[16];
+    float p3[3]{0.5f, 0.5f, 1.5f};
+    float d3[3]{0.5f, -0.5f, -1.5f};
+    float u3[3]{0.0f, 1.0f, 0.0f};
+
+    create_matrix_bt(d3, u3, b_array3);
+
+    glm::mat4 b_t3 = glm::make_mat4(b_array3);
 
     float t_array[16] = {1.00f, 0.00f, 0.00f, 0.00f,
                          0.00f, 1.00f, 0.00f, 0.00f,
@@ -169,7 +199,21 @@ void Display(void)
 
     glm::mat4 t = glm::make_mat4(t_array);
 
-        // Matriz Projection //////////////////////////////////////////////////////
+    float t_array2[16] = {1.00f, 0.00f, 0.00f, 0.00f,
+                          0.00f, 1.00f, 0.00f, 0.00f,
+                          0.00f, 0.00f, 1.00f, 0.00f,
+                          -p2[0], -p2[1], -p2[2], 1.00f};
+
+    glm::mat4 t2 = glm::make_mat4(t_array2);
+
+    float t_array3[16] = {1.00f, 0.00f, 0.00f, 0.00f,
+                          0.00f, 1.00f, 0.00f, 0.00f,
+                          0.00f, 0.00f, 1.00f, 0.00f,
+                          -p3[0], -p3[1], -p3[2], 1.00f};
+
+    glm::mat4 t3 = glm::make_mat4(t_array3);
+
+    // Matriz Projection //////////////////////////////////////////////////////
     // You will have to change the contents of this matrix for the exercises
     float proj_array[16] = {1.0f, 0.0f, 0.0f, 0.0f,
                             0.0f, 1.0f, 0.0f, 0.0f,
@@ -184,6 +228,13 @@ void Display(void)
                              0.0f, 0.0f, 0.125f, 0.0f};
 
     glm::mat4 proj_mat2 = glm::make_mat4(proj_array2);
+
+    float proj_array3[16] = {1.0f, 0.0f, 0.0f, 0.0f,
+                             0.0f, 1.0f, 0.0f, 0.0f,
+                             0.0f, 0.0f, 1.0f, -1.2f,
+                             0.0f, 0.0f, 0.83f, 0.0f};
+
+    glm::mat4 proj_mat3 = glm::make_mat4(proj_array3);
 
     // Thr NDC is a left handed system, so we flip along the Z axis.
     // IMPORTANT: Do not change the contents of this matrix!!!!!!
@@ -204,13 +255,19 @@ void Display(void)
 
     glm::mat4 model_view_proj_mat4 = flip_z_mat * proj_mat2 * (b_t * t) * model_mat; // Questao 3.
 
+    glm::mat4 model_view_proj_mat5 = flip_z_mat * proj_mat3 * (b_t2 * t2) * model_mat3; // Questao 3.
+
+    glm::mat4 model_view_proj_mat6 = flip_z_mat * proj_mat3 * (b_t3 * t3) * model_mat4; // Questao 3.
+
     unsigned int transformLoc;
     GL_CHECK(transformLoc = glGetUniformLocation(shader_program, "transform"));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat1));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat2));
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat3));
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat4));
+    // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat4));
+    // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat5));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model_view_proj_mat6));
 
     // Ativa o Vertex Array Object selecionado.
     glBindVertexArray(vao);
