@@ -174,6 +174,11 @@ git clone https://github.com/JRaphaelO/CG/
 cd CG/Exercicio03
 ```
 
+* Exzecute o comando abaixo antes de compilar:
+```
+export MESA_GL_VERSION_OVERRIDE=3.3
+```
+
 * Execute o comando make para compilar:
 ```
 make
